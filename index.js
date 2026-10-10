@@ -47,10 +47,14 @@ new Server({
 
     client.on('session', (accept, reject) => {
       const session = accept();
-      session.once('exec', (accept, reject, info) => {
-        console.log('Client wants to execute: ' + inspect(info.command));
+
+      session.once('pty', (accept, reject, info) => {
+        if (accept) accept;
+      })
+
+      session.on('shell', (accept, reject) => {
+        if (!accept) return;
         const stream = accept();
-        stream.stderr.write('Oh no, the dreaded errors!\n');
         stream.write('Just kidding about the errors!\n');
         stream.exit(0);
         stream.end();
