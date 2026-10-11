@@ -1,68 +1,94 @@
+#! /usr/bin/env node
+
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
 const { inspect } = require('util');
+const inquirer = require('inquirer').default;
 
 const { Server } = require('ssh2');
 
+const chalk = require('./chalk.js');
 const allowedUser = Buffer.from('foo');
 const allowedPassword = Buffer.from('bar');
 
 function checkValue(input, allowed) {
-  const autoReject = (input.length !== allowed.length);
-  if (autoReject) {
-    // Prevent leaking length information by always making a comparison with the
-    // same input when lengths don't match what we expect ...
-    allowed = input;
-  }
-  const isMatch = timingSafeEqual(input, allowed);
-  return (!autoReject && isMatch);
+	const autoReject = (input.length !== allowed.length);
+	if (autoReject) {
+		// Prevent leaking length information by always making a comparison with the
+		// same input when lengths don't match what we expect ...
+		allowed = input;
+	}
+	const isMatch = timingSafeEqual(input, allowed);
+	return (!autoReject && isMatch);
 }
 
 new Server({
-  hostKeys: [readFileSync('host.key')]
+	hostKeys: [readFileSync('host.key')]
 }, (client) => {
-  console.log('Client connected!');
+	console.log('Client connected!');
 
-  client.on('authentication', (ctx) => {
-    let allowed = true;
-    if (!checkValue(Buffer.from(ctx.username), allowedUser))
-      allowed = false;
+	client.on('authentication', (ctx) => {
+		let allowed = true;
+		if (!checkValue(Buffer.from(ctx.username), allowedUser))
+			allowed = false;
 
-    switch (ctx.method) {
-      case 'password':
-        if (!checkValue(Buffer.from(ctx.password), allowedPassword))
-          return ctx.reject();
-        break;
-      default:
-        return ctx.reject(['password']);
-    }
+		switch (ctx.method) {
+			case 'password':
+				if (!checkValue(Buffer.from(ctx.password), allowedPassword))
+					return ctx.reject();
+				break;
+			default:
+				return ctx.reject(['password']);
+		}
 
-    if (allowed)
-      ctx.accept();
-    else
-      ctx.reject();
-    
-  }).on('ready', () => {
-    console.log('Client authenticated!');
+		if (allowed)
+			ctx.accept();
+		else
+			ctx.reject();
 
-    client.on('session', (accept, reject) => {
-      const session = accept();
+	}).on('ready', () => {
+		console.log('Client authenticated!');
 
-      session.once('pty', (accept, reject, info) => {
-        if (accept) accept;
-      })
+		client.on('session', (accept, reject) => {
+			const session = accept();
 
-      session.on('shell', (accept, reject) => {
-        if (!accept) return;
-        const stream = accept();
-        stream.write('Just kidding about the errors!\n');
-        stream.exit(0);
-        stream.end();
-      });
-    });
-  }).on('close', () => {
-    console.log('Client disconnected');
-  });
-}).listen(2222, '127.0.0.1', function() {
-  console.log('Listening on port ' + this.address().port);
+			session.once('pty', (accept, reject, info) => {
+				if (accept) accept;
+			})
+
+			session.on('shell', async (accept, reject) => {
+				const stream = accept();
+
+				const rules = () => {
+					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
+					stream.write(chalk.bgBlue(`\r\nHello, escapist. You are currently in a state of unconsciousness.\r\n`))
+					stream.write(chalk.bgBlue(`\r\nDon't worry too much. Open your eyes.\r\n`))
+				}
+				rules();
+				await askOpenEyes();
+				async function askOpenEyes() {
+					const answer = await inquirer.prompt({
+						response: 'response',
+						question: 'Open your eyes? Yes/No/[Fingerprint] /j',
+						default() {
+							return false
+						},
+					});
+					return handleAnswer(answer.response == 'Yes')
+				}
+				async function handleAnswer() {
+					
+				}
+			});
+
+			// reprint stuff when terminal window size changes
+			process.on('SIGWINCH', () => {
+				console.log("terminal resized")
+			})
+		});
+	}).on('close', () => {
+		console.log('Client disconnected');
+	});
+}).listen(1234, '127.0.0.1', function () {
+	console.log('Listening on port ' + this.address().port);
 });
