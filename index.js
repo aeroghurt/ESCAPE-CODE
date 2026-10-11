@@ -2,8 +2,8 @@
 
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
-const { inspect } = require('util');
-const inquirer = require('@inquirer/prompts');
+const inquirer = require('inquirer').default;
+const { createSpinner } = require('nanospinner');
 
 const { Server } = require('ssh2');
 
@@ -58,6 +58,7 @@ new Server({
 
 			session.on('shell', async (accept, reject) => {
 				const stream = accept();
+				const sleep = (ms = 2000) => new Promise(() => setTimeout());
 
 				const rules = () => {
 					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
@@ -68,16 +69,25 @@ new Server({
 				await askOpenEyes();
 				async function askOpenEyes() {
 					const answer = await inquirer.prompt({
-						response: 'response',
-						question: 'Open your eyes? Yes/No/[Fingerprint] /j',
+						name: 'question 1',
+						type: 'input',
+						message: 'Open your eyes? Yes/No/[Fingerprint] /j\n',
 						default() {
-							return false
-						},
+							return 'No';
+						}
 					});
 					return handleAnswer(answer.response == 'Yes')
 				}
-				async function handleAnswer() {
-					
+				async function handleAnswer(isCorrect) {
+					const spinner = createSpinner('... Waiting for response.').start();
+					await sleep();
+
+					if (isCorrect) {
+						spinner.success({ text: `Good. Moving on to the next level...` });
+					} else {
+						spinner.error( { text: `Goodbye.`});
+						process.exit(1);
+					}
 				}
 			});
 
