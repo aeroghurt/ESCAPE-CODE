@@ -3,7 +3,7 @@
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
 const { inspect } = require('util');
-const inquirer = require('inquirer').default;
+const inquirer = require('@inquirer/prompts');
 
 const { Server } = require('ssh2');
 
