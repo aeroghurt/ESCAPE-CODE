@@ -3,3 +3,4 @@ node_modules
 host.key
 package-lock.json
 package.json
+.DS_STORE
