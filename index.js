@@ -68,75 +68,6 @@ new Server({
 					terminal: true,
 				});
 
-				const intro = () => {
-					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
-					stream.write(chalk.bgBlue(`\r\nHello, escapist. You are currently in a state of unconsciousness.\r\n`))
-					stream.write(chalk.bgBlue(`\r\nDon't worry too much. Open your eyes.\r\n`))
-				}
-				intro();
-
-				const prologue = () => {
-					allowed = false;
-					rl.question('\r\nOpen your eyes? (yes/no/[fingerprint]) /j\r\n', (answer) => {
-						if (answer === "yes" || answer === "y" || answer === "Yes") {
-							rl.close();
-							level_1();
-						} else {
-							stream.write(chalk.blue(`\r\nFine.\r\n`));
-							process.exit(1);
-						}
-					})
-				}
-				prologue();
-
-				const level_1 = () => {
-					stream.write(chalk.bgYellow(`\r\nYou are sitting in a white-padded room. You try to remember how you got there, but return empty-handed. In front of you is a table with two things: a ${chalk.red(`sheet of paper`)}`) + chalk.bgYellow(` and a ${chalk.red(`cardboard roll.`)}\r\n`))
-					stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`)
-
-					allowed = true;
-
-					const commands = {
-						help() {
-							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`);
-						},
-
-						1() {
-							stream.write(`\r\nWYRHOSYUIDPSOET\r\n`);
-						},
-
-						2() {
-							stream.write(`\r\nHm. Maybe it's not a toilet paper roll, as you'd initially thought. It's a bit longer than your average roll...\r\n`);
-						},
-
-						3() {
-							stream.write(`\r\nYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
-						},
-
-						answer() {
-							rl.question(`\r\nWhat's your answer?\r\n`, (answer) => {
-								if (answer === "WHYDOYOUPERSIST") {
-									rl.close();
-									level_2();
-								} else {
-									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
-									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
-									stream.write(chalk.bgYellow(`\r\nBefore you go unconscious completely, you hear 'Goodbye escapist' one last time.\r\n`));
-
-									process.exit(1);
-								}
-							})
-						},
-
-						hint() {
-							stream.write(`\r\ncardboard rolls and paper *cipher* ;)\r\n`)
-						}
-					}
-				}
-
-				const level_2 = () => {
-
-				}
-
 				if (allowed) {
 					stream.on('data', (data) => {
 						if (data.includes('0x03')) {
@@ -180,10 +111,79 @@ new Server({
 
 							buffer += char;
 							stream.write(char);
+							console.log(char);
 						}
 					})
 				}
 
+
+				const intro = () => {
+					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
+					stream.write(chalk.bgBlue(`\r\nHello, escapist. You are currently in a state of unconsciousness.\r\n`))
+					stream.write(chalk.bgBlue(`\r\nDon't worry too much. Open your eyes.\r\n`))
+				}
+				intro();
+
+				const prologue = () => {
+					allowed = false;
+					rl.question('\r\nOpen your eyes? (yes/no/[fingerprint]) /j\r\n', (answer) => {
+						if (answer === "yes" || answer === "y" || answer === "Yes") {
+							level_1();
+						} else {
+							stream.write(chalk.blue(`\r\nFine.\r\n`));
+							process.exit(1);
+						}
+					})
+				}
+				prologue();
+
+				const level_1 = () => {
+					
+					stream.write(chalk.bgYellow(`\r\nYou are sitting in a white-padded room. You try to remember how you got there, but return empty-handed. In front of you is a table with two things: a ${chalk.red(`sheet of paper`)}`) + chalk.bgYellow(` and a ${chalk.red(`cardboard roll.`)}\r\n`))
+					stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`)
+
+					const commands = {
+						help() {
+							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`);
+						},
+
+						1() {
+							stream.write(`\r\nWYRHOSYUIDPSOET\r\n`);
+						},
+
+						2() {
+							stream.write(`\r\nHm. Maybe it's not a toilet paper roll, as you'd initially thought. It's a bit longer than your average roll...\r\n`);
+						},
+
+						3() {
+							stream.write(`\r\nYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
+						},
+
+						answer() {
+							rl.question(`\r\nWhat's your answer?\r\n`, (answer) => {
+								if (answer === "WHYDOYOUPERSIST") {
+									rl.close();
+									level_2();
+								} else {
+									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
+									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
+									stream.write(chalk.bgYellow(`\r\nBefore you go unconscious completely, you hear 'Goodbye escapist' one last time.\r\n`));
+
+									process.exit(1);
+								}
+							})
+						},
+
+						hint() {
+							stream.write(`\r\ncardboard rolls and paper *cipher* ;)\r\n`)
+						},
+					}
+					allowed = true;
+				}
+
+				const level_2 = () => {
+
+				}
 
 				// const intermission = () => {
 				// 	stream.write(chalk.bgRed(`\r\nYeetus\r\n`))
