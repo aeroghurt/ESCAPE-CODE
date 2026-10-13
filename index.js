@@ -13,6 +13,7 @@ const allowedPassword = Buffer.from('bar');
 
 let buffer = '';
 let allowed = false;
+let current_commands;
 
 function checkValue(input, allowed) {
 	const autoReject = (input.length !== allowed.length);
@@ -68,8 +69,11 @@ new Server({
 					terminal: true,
 				});
 
+				function listen_for_commands() {};
+
 				if (allowed) {
-					stream.on('data', (data) => {
+					listen_for_commands = () => stream.on('data', (data) => {
+						console.log(`wssup`)
 						if (data.includes('0x03')) {
 							stream.exit(0);
 							stream.end();
@@ -83,10 +87,11 @@ new Server({
 								const command = buffer.trim().toLowerCase();
 
 								stream.write(`\r\n`);
+								console.log(current_commands)
 
 								if (command) {
-									if (commands[command]) {
-										commands[command]();
+									if (current_commands[command]) {
+										current_commands[command]();
 									} else {
 										stream.write(stream.bgRed(`Unknown command: ${command}\r\n`));
 									}
@@ -111,11 +116,9 @@ new Server({
 
 							buffer += char;
 							stream.write(char);
-							console.log(char);
 						}
 					})
 				}
-
 
 				const intro = () => {
 					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
@@ -138,11 +141,10 @@ new Server({
 				prologue();
 
 				const level_1 = () => {
-					
 					stream.write(chalk.bgYellow(`\r\nYou are sitting in a white-padded room. You try to remember how you got there, but return empty-handed. In front of you is a table with two things: a ${chalk.red(`sheet of paper`)}`) + chalk.bgYellow(` and a ${chalk.red(`cardboard roll.`)}\r\n`))
 					stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`)
 
-					const commands = {
+					current_commands = {
 						help() {
 							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`);
 						},
@@ -162,7 +164,6 @@ new Server({
 						answer() {
 							rl.question(`\r\nWhat's your answer?\r\n`, (answer) => {
 								if (answer === "WHYDOYOUPERSIST") {
-									rl.close();
 									level_2();
 								} else {
 									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
@@ -179,37 +180,12 @@ new Server({
 						},
 					}
 					allowed = true;
+					listen_for_commands();
 				}
 
 				const level_2 = () => {
 
 				}
-
-				// const intermission = () => {
-				// 	stream.write(chalk.bgRed(`\r\nYeetus\r\n`))
-				// }
-				// intermission();
-				// await askOpenEyes();
-
-				// async function askOpenEyes() {
-				// 	const answer = await input({
-				// 		message: 'Open your eyes? Yes/No/[Fingerprint] /j\n',
-				// 		default: 'Yes'
-				// 	});
-				// 	return handleAnswer(answer === 'Yes')
-				// }
-
-				// async function handleAnswer(isCorrect) {
-				// 	const spinner = createSpinner('... Waiting for response.').start();
-				// 	await sleep();
-
-				// 	if (isCorrect) {
-				// 		spinner.success({ text: `Good. Moving on to the next level...` });
-				// 	} else {
-				// 		spinner.error( { text: `Goodbye.`});
-				// 		process.exit(1);
-				// 	}
-				// }
 			});
 
 			// reprint stuff when terminal window size changes
@@ -219,6 +195,7 @@ new Server({
 		});
 	}).on('close', () => {
 		console.log('Client disconnected');
+		allowed = false;
 	});
 }).listen(1234, '127.0.0.1', function () {
 	console.log('Listening on port ' + this.address().port);
