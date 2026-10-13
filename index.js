@@ -14,6 +14,7 @@ const allowedPassword = Buffer.from('bar');
 let buffer = '';
 let allowed = false;
 let current_commands;
+let writeCommandsAllowed = false;
 
 function checkValue(input, allowed) {
 	const autoReject = (input.length !== allowed.length);
@@ -69,11 +70,10 @@ new Server({
 					terminal: true,
 				});
 
-				function listen_for_commands() {};
 
-				if (allowed) {
-					listen_for_commands = () => stream.on('data', (data) => {
-						console.log(`wssup`)
+				listen_for_commands = () => stream.on('data', (data) => {
+					console.log(`wssup`)
+					if (writeCommandsAllowed) {
 						if (data.includes('0x03')) {
 							stream.exit(0);
 							stream.end();
@@ -117,8 +117,8 @@ new Server({
 							buffer += char;
 							stream.write(char);
 						}
-					})
-				}
+					}
+				})
 
 				const intro = () => {
 					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
@@ -128,15 +128,16 @@ new Server({
 				intro();
 
 				const prologue = () => {
-					allowed = false;
-					rl.question('\r\nOpen your eyes? (yes/no/[fingerprint]) /j\r\n', (answer) => {
-						if (answer === "yes" || answer === "y" || answer === "Yes") {
-							level_1();
-						} else {
-							stream.write(chalk.blue(`\r\nFine.\r\n`));
-							process.exit(1);
-						}
-					})
+					if (!writeCommandsAllowed) {
+						rl.question('\r\nOpen your eyes? (yes/no/[fingerprint]) /j\r\n', (answer) => {
+							if (answer === "yes" || answer === "y" || answer === "Yes") {
+								level_1();
+							} else {
+								stream.write(chalk.blue(`\r\nFine.\r\n`));
+								process.exit(1);
+							}
+						})
+					}
 				}
 				prologue();
 
@@ -179,7 +180,7 @@ new Server({
 							stream.write(`\r\ncardboard rolls and paper *cipher* ;)\r\n`)
 						},
 					}
-					allowed = true;
+					writeCommandsAllowed = true;
 					listen_for_commands();
 				}
 
