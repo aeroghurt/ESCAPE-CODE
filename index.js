@@ -70,9 +70,7 @@ new Server({
 					terminal: true,
 				});
 
-
-				listen_for_commands = () => stream.on('data', (data) => {
-					console.log(`wssup`)
+				stream.on('data', (data) => {
 					if (writeCommandsAllowed) {
 						if (data.includes('0x03')) {
 							stream.exit(0);
@@ -87,13 +85,12 @@ new Server({
 								const command = buffer.trim().toLowerCase();
 
 								stream.write(`\r\n`);
-								console.log(current_commands)
 
 								if (command) {
 									if (current_commands[command]) {
 										current_commands[command]();
 									} else {
-										stream.write(stream.bgRed(`Unknown command: ${command}\r\n`));
+										stream.write(chalk.bgRed(`Unknown command: ${command}\r`));
 									}
 								}
 
@@ -106,7 +103,7 @@ new Server({
 								continue;
 							}
 
-							if (char === '\x7f' || char === 'b') {
+							if (char === '\x7f' || char === '\b') {
 								if (buffer.length > 0) {
 									buffer = buffer.slice(0, -1);
 									stream.write(`\b \b`);
@@ -115,7 +112,8 @@ new Server({
 							}
 
 							buffer += char;
-							stream.write(char);
+							// this line was the problem im so mad >:(
+							// stream.write(char);
 						}
 					}
 				})
@@ -151,15 +149,15 @@ new Server({
 						},
 
 						1() {
-							stream.write(`\r\nWYRHOSYUIDPSOET\r\n`);
+							stream.write(`\rWYRHOSYUIDPSOET\r\n`);
 						},
 
 						2() {
-							stream.write(`\r\nHm. Maybe it's not a toilet paper roll, as you'd initially thought. It's a bit longer than your average roll...\r\n`);
+							stream.write(`\rHm. Maybe it's not a toilet paper roll, as you'd initially thought. It's a bit longer than your average roll...\r\n`);
 						},
 
 						3() {
-							stream.write(`\r\nYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
+							stream.write(`\rYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
 						},
 
 						answer() {
@@ -177,11 +175,10 @@ new Server({
 						},
 
 						hint() {
-							stream.write(`\r\ncardboard rolls and paper *cipher* ;)\r\n`)
+							stream.write(`\rcardboard rolls and paper cipher ;)\r\n`)
 						},
 					}
 					writeCommandsAllowed = true;
-					listen_for_commands();
 				}
 
 				const level_2 = () => {
@@ -190,9 +187,9 @@ new Server({
 			});
 
 			// reprint stuff when terminal window size changes
-			process.on('SIGWINCH', () => {
-				console.log("terminal resized")
-			})
+			// process.on('SIGWINCH', () => {
+			// 	console.log("terminal resized")
+			// })
 		});
 	}).on('close', () => {
 		console.log('Client disconnected');
