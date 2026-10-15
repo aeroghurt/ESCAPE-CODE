@@ -1,9 +1,9 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
+const process = require('node:process');
 const readline = require('readline');
-const { createSpinner } = require('nanospinner');
 
 const { Server } = require('ssh2');
 
@@ -12,7 +12,6 @@ const allowedUser = Buffer.from('foo');
 const allowedPassword = Buffer.from('bar');
 
 let buffer = '';
-let allowed = false;
 let current_commands;
 let writeCommandsAllowed = false;
 
@@ -63,7 +62,7 @@ new Server({
 
 			session.on('shell', async (accept, reject) => {
 				const stream = accept();
-				const sleep = (ms = 2000) => new Promise(() => setTimeout());
+				// const sleep = (ms = 2000) => new Promise(() => setTimeout());
 				const rl = readline.createInterface({
 					input: stream,
 					output: stream,
@@ -72,12 +71,6 @@ new Server({
 
 				stream.on('data', (data) => {
 					if (writeCommandsAllowed) {
-						if (data.includes('0x03')) {
-							stream.exit(0);
-							stream.end();
-							return;
-						}
-
 						const input = data.toString();
 
 						for (const char of input) {
@@ -101,6 +94,11 @@ new Server({
 								}
 
 								continue;
+							}
+
+							if (char === '\x1b') {
+								stream.write(chalk.bgRed(`\r\nHaha you think you're so funny.\r\n`));
+								return;
 							}
 
 							if (char === '\x7f' || char === '\b') {
@@ -161,13 +159,15 @@ new Server({
 						},
 
 						answer() {
+							writeCommandsAllowed = false;
 							rl.question(`\r\nWhat's your answer?\r\n`, (answer) => {
 								if (answer === "WHYDOYOUPERSIST") {
+									stream.write(chalk.blue(`\r\nMOving on....\r\n`));
 									level_2();
 								} else {
 									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
 									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
-									stream.write(chalk.bgYellow(`\r\nBefore you go unconscious completely, you hear 'Goodbye escapist' one last time.\r\n`));
+									stream.write(chalk.bgYellow(`\r\nBefore you go unconscious completely, you hear 'Goodbye escapist' one last time.\n\r`));
 
 									process.exit(1);
 								}
@@ -184,6 +184,12 @@ new Server({
 				const level_2 = () => {
 
 				}
+
+				rl.on('keypress', function (_, key) {
+					if (key.name === 'q') {
+						stream.write(`haha`)
+					}
+				})
 			});
 
 			// reprint stuff when terminal window size changes
