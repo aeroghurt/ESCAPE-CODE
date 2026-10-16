@@ -139,15 +139,67 @@ new Server({
 
 				const level_1 = () => {
 					stream.write(chalk.bgYellow(`\r\nYou are sitting in a white-padded room. You try to remember how you got there, but return empty-handed. In front of you is a table with two things: a ${chalk.red(`sheet of paper`)}`) + chalk.bgYellow(` and a ${chalk.red(`cardboard roll.`)}\r\n`))
-					stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`)
+					stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer', to prompt you\r\n- 'hint', if you really need it\r\n`)
 
 					current_commands = {
 						help() {
-							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer' + your answer, to progress to the next level\r\n- 'hint', if you really need it\r\n`);
+							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer', to prompt you\r\n- 'hint', if you really need it\r\n`);
 						},
 
 						1() {
 							stream.write(`\rWYRHOSYUIDPSOET\r\n`);
+						},
+
+						2() {
+							stream.write(`\rHm. Maybe it's not a toilet paper roll, as you'd initially thought. It's a bit longer than your average roll...\r\n`);
+						},
+
+						3() {
+							stream.write(`\rYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
+						},
+
+						answer() {
+							writeCommandsAllowed = false;
+							rl.question(`What's your answer?\r\n`, (answer) => {
+								if (answer === "WHYDOYOUPERSIST") {
+									stream.write(chalk.bgYellow(`\r\nYou hear unlatching. A door that wasn't there before opens before your eyes. Stumbling, you walk over to the next room, terrified but keen to escape.\r`));
+									stream.write(chalk.bgYellow(`\r\nThis time, the next door is more obvious. It has an industrial look to it and looks heavy. Next to it is a keypad. You assume that the passcode is 4 digits long. There are words engraved into the steel.`));
+									level_2();
+								} else {
+									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
+									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
+
+									process.exit(1);
+								}
+							})
+						},
+
+						hint() {
+							stream.write(`\rcardboard rolls and paper cipher ;)\r\n`)
+						},
+					}
+					writeCommandsAllowed = true;
+				}
+
+				const level_2 = () => {
+					const image = `
+           .......               .......            ...                       .......        
+           .......               .......            ...                       .......        
+    ...	   .......        ...    .......         ...                    ...   .......        
+    ...	   .......        ...    .......         ...                    ...   .......        
+...........           ...........            ...........            ...........               
+...........           ...........            ...........            ...........               
+`;
+					stream.write(chalk.white(`\r\n	   ${image.trim().replace(/\n/g, '\r\n')}`));
+					stream.write(`\r\nType:\r\n- 1: to view image again\r\n- 'answer', to prompt you\r\n- 'hint'\r\n`)
+
+					current_commands = {
+						help() {
+							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer, 'to prompt you\r\n- 'hint', if you really need it\r\n`);
+						},
+
+						1() {
+							stream.write(`\r${image}\r\n`);
 						},
 
 						2() {
@@ -178,18 +230,7 @@ new Server({
 							stream.write(`\rcardboard rolls and paper cipher ;)\r\n`)
 						},
 					}
-					writeCommandsAllowed = true;
-				}
-
-				const level_2 = () => {
-
-				}
-
-				rl.on('keypress', function (_, key) {
-					if (key.name === 'q') {
-						stream.write(`haha`)
-					}
-				})
+				};
 			});
 
 			// reprint stuff when terminal window size changes
