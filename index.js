@@ -137,8 +137,8 @@ new Server({
 //░╚═════╝░╚═════╝░╚═════╝░╚══════╝░░░░░░░░░░░░░░░//
 ////////////////////////////////////////////////////
 `
-					stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
-					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in the README but reading before solving is mildly discouraged. Have fun :D\r\n`))
+					stream.write(chalk.green(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
+					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools. Solutions are available in DONTREADME.md but reading before solving is mildly discouraged. Have fun :D\r\n`))
 					stream.write(chalk.bgBlue(`\r\nHello, escapist. You are currently in a state of unconsciousness.\r\n`))
 					stream.write(chalk.bgBlue(`\r\nDon't worry too much. Open your eyes.\r\n`))
 				}
@@ -273,7 +273,20 @@ new Server({
 						level_4();
 						return;
 					}
-					if (hasWalkedIntoRoom3Already) {
+
+					const banner = `
+//////////////////////////////////////////////////////////
+//██╗░░░░░███████╗██╗░░░██╗███████╗██╗░░░░░░░░░██████╗░░//
+//██║░░░░░██╔════╝██║░░░██║██╔════╝██║░░░░░░░░░╚════██╗░//
+//██║░░░░░█████╗░░██║░░░██║█████╗░░██║░░░░░░░░░░█████╔╝░//
+//██║░░░░░██╔══╝░░╚██╗░██╔╝██╔══╝░░██║░░░░░░░░░░╚═══██╗░//
+//███████╗███████╗░╚████╔╝░███████╗███████╗░░░░██████╔╝░//
+//╚══════╝╚══════╝░░╚═══╝░░╚══════╝╚══════╝░░░░╚═════╝░░//
+//////////////////////////////////////////////////////////
+`
+
+					if (!hasWalkedIntoRoom3Already) {
+						stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
 						stream.write(chalk.bgYellow(`\r\nA fingerprint reader and an iris scanner. Those two seem to be the only thing in the world that matter right now. Without skipping a beat, you walk over to it clumsily, hungrily.\r\n`));
 					}
 
@@ -289,7 +302,7 @@ new Server({
 							if (fingerprintAgreed && eyescanAgreed) {
 								level_4();
 							} else {
-								rl.question(chalk.blue(`Scan your irises? (yes/no)\r\n`), (answer) => {
+								rl.question(chalk.blue(`Put thumb onto fingerprint reader? (yes/no)\r\n`), (answer) => {
 									if (answer === 'yes' || answer === 'y') {
 										fingerprintAgreed = true;
 										level_3();
@@ -330,6 +343,17 @@ new Server({
 				};
 
 				const level_4 = () => {
+					const banner = `
+//////////////////////////////////////////////////////////
+//██╗░░░░░███████╗██╗░░░██╗███████╗██╗░░░░░░░░░██╗░░██╗░//
+//██║░░░░░██╔════╝██║░░░██║██╔════╝██║░░░░░░░░░██║░░██║░//
+//██║░░░░░█████╗░░██║░░░██║█████╗░░██║░░░░░░░░░███████║░//
+//██║░░░░░██╔══╝░░╚██╗░██╔╝██╔══╝░░██║░░░░░░░░░╚════██║░//
+//███████╗███████╗░╚████╔╝░███████╗███████╗░░░░░░░░░██║░//
+//╚══════╝╚══════╝░░╚═══╝░░╚══════╝╚══════╝░░░░░░░░░╚═╝░//
+//////////////////////////////////////////////////////////
+`
+					stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
 					stream.write(chalk.bgYellow(`\r\nLevel 4!!!\r\n`));
 				};
 
@@ -350,16 +374,11 @@ new Server({
 					stream.end();
 				}
 			});
-
-			// reprint stuff when terminal window size changes
-			// process.on('SIGWINCH', () => {
-			// 	console.log("terminal resized")
-			// })
 		});
 	}).on('close', () => {
 		console.log('Client disconnected');
 		allowed = false;
 	});
-}).listen(1234, '127.0.0.1', function () {
+}).listen(2012, '::', function () {
 	console.log('Listening on port ' + this.address().port);
 });
