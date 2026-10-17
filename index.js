@@ -125,7 +125,7 @@ new Server({
 
 				const prologue = () => {
 					if (!writeCommandsAllowed) {
-						rl.question('\r\nOpen your eyes? (yes/no/[fingerprint]) /j\r\n', (answer) => {
+						rl.question(chalk.blue('\r\nOpen your eyes? (yes/no/[fingerprint]) /j\r\n'), (answer) => {
 							if (answer === "yes" || answer === "y" || answer === "Yes") {
 								level_1();
 							} else {
@@ -160,7 +160,7 @@ new Server({
 
 						answer() {
 							writeCommandsAllowed = false;
-							rl.question(`What's your answer?\r\n`, (answer) => {
+							rl.question(chalk.blue(`What's your answer?\r\n`), (answer) => {
 								if (answer === "WHYDOYOUPERSIST") {
 									stream.write(chalk.bgYellow(`\r\nYou hear unlatching. A door that wasn't there before opens before your eyes. Stumbling, you walk over to the next room, terrified but keen to escape.\r`));
 									stream.write(chalk.bgYellow(`\r\nThis time, the next door is more obvious. It has an industrial look to it and looks heavy. Next to it is a keypad. You assume that the passcode is 4 digits long. There are words engraved into the steel.`));
@@ -169,7 +169,8 @@ new Server({
 									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
 									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
 
-									process.exit(1);
+									stream.exit(0);
+									stream.end();
 								}
 							})
 						},
@@ -191,45 +192,145 @@ new Server({
 ...........           ...........            ...........            ...........               
 `;
 					stream.write(chalk.white(`\r\n	   ${image.trim().replace(/\n/g, '\r\n')}`));
+					stream.write(chalk.blue(`\r\nA: 7641\r\nB: 6698\r\nC: 1720\r\nD: 2153\r\n`));
+					stream.write(chalk.white(`\r\n\x1b[3mBlind, you are, yet still looking for something.\x1b[0m`));
 					stream.write(`\r\nType:\r\n- 1: to view image again\r\n- 'answer', to prompt you\r\n- 'hint'\r\n`)
 
 					current_commands = {
 						help() {
-							stream.write(`\r\nType:\r\n- 1: to view paper\r\n- 2: to view cardboard roll\r\n- 3: to look around\r\n- 'answer, 'to prompt you\r\n- 'hint', if you really need it\r\n`);
+							stream.write(`\r\nType:\r\n- 1: to view image again\r\n- 'answer', to prompt you\r\n- 'hint'\r\n`)
 						},
 
 						1() {
-							stream.write(`\r${image}\r\n`);
-						},
-
-						2() {
-							stream.write(`\rHm. Maybe it's not a toilet paper roll, as you'd initially thought. It's a bit longer than your average roll...\r\n`);
-						},
-
-						3() {
-							stream.write(`\rYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
+							stream.write(chalk.white(`\r\n	   ${image.trim().replace(/\n/g, '\r\n')}`));
 						},
 
 						answer() {
 							writeCommandsAllowed = false;
-							rl.question(`\r\nWhat's your answer?\r\n`, (answer) => {
-								if (answer === "WHYDOYOUPERSIST") {
-									stream.write(chalk.blue(`\r\nMOving on....\r\n`));
-									level_2();
+							rl.question(chalk.blue(`What's your answer?\r\n`), (answer) => {
+								if (answer === "B" || answer == "b") {
+									level_3();
 								} else {
 									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
 									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
-									stream.write(chalk.bgYellow(`\r\nBefore you go unconscious completely, you hear 'Goodbye escapist' one last time.\n\r`));
 
-									process.exit(1);
+									stream.exit(0);
+									stream.end();
 								}
 							})
 						},
 
 						hint() {
-							stream.write(`\rcardboard rolls and paper cipher ;)\r\n`)
+							stream.write(`\rLife is just a game and we are its inhabitants.\r\n`)
 						},
 					}
+					writeCommandsAllowed = true;
+				};
+
+				const level_3 = () => {
+					let fingerprintAgreed = false;
+					let eyescanAgreed = false;
+
+					stream.write(chalk.bgYellow(`\r\nA fingerprint reader and an iris scanner. Those two seem to be the only thing in the world that matter right now. Without skipping a beat, you walk over to it clumsily, hungrily.\r\n`));
+					stream.write(`\r\nType:\r\n- 1: fingerprint reader\r\n- 2: iris scanner\r\n`)
+
+					current_commands = {
+						help() {
+							stream.write(`\r\nType:\r\n- 1: fingerprint reader\r\n- 2: iris scanner\r\n`)
+						},
+
+						1() {
+							writeCommandsAllowed = false;
+							if (fingerprintAgreed && eyescanAgreed) {
+								level_4();
+							} else if (!fingerprintAgreed) {
+								rl.question(chalk.blue(`Scan your irises? (yes/no)\r\n`), (answer) => {
+									if (answer === 'yes' || answer === 'y') {
+										fingerprintAgreed = true;
+										2();
+									} else {
+										stream.write(chalk.blue(`\r\nUnforunately, we cannot allow that to happen. Goodbye, escapist.\r\n`));
+										stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
+
+										stream.exit(0);
+										stream.end();
+									}
+								})
+							}
+						},
+
+						2() {
+							writeCommandsAllowed = false;
+							if (fingerprintAgreed && eyescanAgreed) {
+								level_4();
+							} else if (!eyescanAgreed) {
+								rl.question(chalk.blue(`Scan your irises? (yes/no)\r\n`), (answer) => {
+									if (answer === 'yes' || answer === 'y') {
+										eyescanAgreed = true;
+										1();
+									} else {
+										stream.write(chalk.blue(`\r\nUnforunately, we cannot allow that to happen. Goodbye, escapist.\r\n`));
+										stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
+
+										stream.exit(0);
+										stream.end();
+									}
+								})
+							}
+						},
+
+						answer() {
+							writeCommandsAllowed = false;
+							rl.question(chalk.blue(`What's your answer?\r\n`), (answer) => {
+								if (answer === "B" || answer == "b") {
+									level_3();
+								} else {
+									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
+									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
+
+									stream.exit(0);
+									stream.end();
+								}
+							})
+						},
+
+						hint() {
+							stream.write(`\rLife is just a game and we are its inhabitants.\r\n`)
+						},
+					}
+					writeCommandsAllowed = true;
+				};
+
+				const level_4 = () => {
+
+					stream.write(chalk.bgYellow(`\r\nLevel 4!!!\r\n`));
+					stream.write(`\r\nType:\r\n- 1: fingerprint reader\r\n- 2: iris scanner\r\n`)
+
+					current_commands = {
+						help() {
+							stream.write(`\r\nType:\r\n- 1: fingerprint reader\r\n- 2: iris scanner\r\n`)
+						},
+
+						answer() {
+							writeCommandsAllowed = false;
+							rl.question(chalk.blue(`What's your answer?\r\n`), (answer) => {
+								if (answer === "B" || answer == "b") {
+									level_3();
+								} else {
+									stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
+									stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.\r\n`));
+
+									stream.exit(0);
+									stream.end();
+								}
+							})
+						},
+
+						hint() {
+							stream.write(`\rLife is just a game and we are its inhabitants.\r\n`)
+						},
+					}
+					writeCommandsAllowed = true;
 				};
 			});
 
