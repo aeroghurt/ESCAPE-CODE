@@ -65,7 +65,7 @@ new Server({
 
 			session.on('shell', async (accept, reject) => {
 				const stream = accept();
-				// const sleep = (ms = 2000) => new Promise(() => setTimeout());
+				const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 				const rl = readline.createInterface({
 					input: stream,
 					output: stream,
@@ -113,13 +113,11 @@ new Server({
 							}
 
 							buffer += char;
-							// this line was the problem im so mad >:(
-							// stream.write(char);
 						}
 					}
 				})
 
-				const intro = () => {
+				const intro = async () => {
 					const banner = `
 ////////////////////////////////////////////////////
 //███████╗███████╗░██████╗░█████╗░██████╗░███████╗//
@@ -247,7 +245,7 @@ new Server({
 						},
 
 						2() {
-							stream.write(`\r\nYou run your fingers across the dots raised etched into the door. After a long time of feeling nothing, this sensory experience feels weird, yet oddly nice.\r\n`)
+							stream.write(`\r\nYou run your fingers across the dots etched into the door. After a long time of feeling nothing, this sensory experience feels weird, yet oddly nice.\r\n`)
 						},
 
 						answer() {
@@ -372,6 +370,17 @@ new Server({
 
 					stream.exit(0);
 					stream.end();
+				}
+
+				const progress_bar = async() => {
+					const width = process.stdout.columns;
+					let filled = `█`;
+					let remaining = `/`;
+					for (let i = 0; i <= width; i++) {
+						stream.write(`${filled.repeat(i)}${remaining.repeat(width - i)}`);
+						await sleep(20);
+						stream.write(chalk.green(`\r\x1b[K`));
+					}
 				}
 			});
 		});
