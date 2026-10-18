@@ -8,7 +8,7 @@ const readline = require('readline');
 const { Server } = require('ssh2');
 
 const chalk = require('./chalk.js');
-const allowedUser = Buffer.from('foo');
+const allowedUser = Buffer.from('escapist');
 const allowedPassword = Buffer.from('bar');
 
 let buffer = '';
@@ -388,6 +388,6 @@ new Server({
 		console.log('Client disconnected');
 		allowed = false;
 	});
-}).listen(2222, '127.0.0.1', function () {
+}).listen(1, '::', function () {
 	console.log('Listening on port ' + this.address().port);
 });
