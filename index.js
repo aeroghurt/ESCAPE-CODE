@@ -388,6 +388,6 @@ new Server({
 		console.log('Client disconnected');
 		allowed = false;
 	});
-}).listen(1, '::', function () {
+}).listen(2220, '::', function () {
 	console.log('Listening on port ' + this.address().port);
 });
