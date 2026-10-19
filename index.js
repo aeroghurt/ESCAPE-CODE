@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // problem: only one player can log in at a time.
-// ssh escapist@2a01:4f9:3a:276e::1342 -p 2012
+// ssh escapist@2a01:4f9:3a:276e::1342 -p 1
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
 const process = require('node:process');
@@ -129,6 +129,17 @@ new Server({
 					}
 				}
 
+				const typewriterEffect = async (sentence) => {
+					let line = [];
+					for (const char in sentence) {
+						line.push(sentence[char]);
+						stream.write(chalk.blue(`${line.join("")}`));
+						await sleep(100);
+						stream.write(`\r\x1b[K`);
+					}
+					stream.write(chalk.bgBlue(sentence))
+				}
+
 				const intro = async () => {
 					const banner = `
 ////////////////////////////////////////////////////
@@ -151,6 +162,7 @@ new Server({
 					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools, and the width of your terminal needs to be at least 94 to display things properly. Solutions are available in DONTREADME.md but reading before solving is mildly discouraged. Have fun :D\r\n`))
 					stream.write(chalk.bgBlue(`\r\nHello, escapist. You are currently in a state of unconsciousness.\r\n`))
 					stream.write(chalk.bgBlue(`\r\nDon't worry too much. Open your eyes.\r\n`))
+					await typewriterEffect(`hello world`);
 				}
 				intro();
 
@@ -224,7 +236,6 @@ new Server({
 				}
 
 				const level_2 = async () => {
-					await progress_bar();
 					const image = `
            .......               .......            ...                       .......        
            .......               .......            ...                       .......        
@@ -281,7 +292,6 @@ new Server({
 				};
 
 				const level_3 = async () => {
-					await progress_bar();
 					if (fingerprintAgreed && eyescanAgreed) {
 						level_4();
 						return;
@@ -316,6 +326,7 @@ new Server({
 								level_4();
 							} else {
 								rl.question(chalk.blue(`Put thumb onto fingerprint reader? (yes/no)\r\n`), (answer) => {
+									stream.write(chalk.red(`\x1bAre you quite sure about this?\x1b[0m`));
 									if (answer === 'yes' || answer === 'y') {
 										fingerprintAgreed = true;
 										level_3();
@@ -333,6 +344,7 @@ new Server({
 								level_4();
 							} else {
 								rl.question(chalk.blue(`Scan your irises? (yes/no)\r\n`), (answer) => {
+									stream.write(chalk.red(`\x1bAre you quite sure about this?\x1b[0m`));
 									if (answer === 'yes' || answer === 'y') {
 										eyescanAgreed = true;
 										level_3();
@@ -356,7 +368,8 @@ new Server({
 				};
 
 				const level_4 = async () => {
-					await progress_bar();
+					stream.write(chalk.bgYellow(`\r\n\x1bWell, there's no turning back now.\x1b[0m\r\n`))
+					let line_number = 0;
 					const banner = `
 //////////////////////////////////////////////////////////
 //██╗░░░░░███████╗██╗░░░██╗███████╗██╗░░░░░░░░░██╗░░██╗░//
@@ -367,8 +380,40 @@ new Server({
 //╚══════╝╚══════╝░░╚═══╝░░╚══════╝╚══════╝░░░░░░░░░╚═╝░//
 //////////////////////////////////////////////////////////
 `
+					const banner1 = `
+░█▀▀░█▀▄░█▀▀░█▀▀░█▀▄░█▀█░█▄█░░░▀█▀░█▀▀░░░█▀█░░░█░█░█▀█░█▀█░█░█░░░░
+░█▀▀░█▀▄░█▀▀░█▀▀░█░█░█░█░█░█░░░░█░░▀▀█░░░█▀█░░░█▀█░█░█░█▀█░▄▀▄░░░░
+░▀░░░▀░▀░▀▀▀░▀▀▀░▀▀░░▀▀▀░▀░▀░░░▀▀▀░▀▀▀░░░▀░▀░░░▀░▀░▀▀▀░▀░▀░▀░▀░▄▀░
+`
+					const banner2 = `
+░█▀▀░█░█░█▀▀░█▀▀░█░█░█▄█░█▀▄░░░▀█▀░█▀█░░░▀█▀░█░█░█▀▀░░░█▀█░█▀▀░█░█
+░▀▀█░█░█░█░░░█░░░█░█░█░█░█▀▄░░░░█░░█░█░░░░█░░█▀█░█▀▀░░░█░█░█▀▀░█▄█
+░▀▀▀░▀▀▀░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀▀░░░░░▀░░▀▀▀░░░░▀░░▀░▀░▀▀▀░░░▀░▀░▀▀▀░▀░▀
+░█▀█░█▀█░█▀▄░█▀█░█▀▄░▀█▀░█▀▀░█▀▀░░░                               
+░█▀▀░█▀█░█▀▄░█▀█░█░█░░█░░▀▀█░█▀▀░░░                               
+░▀░░░▀░▀░▀░▀░▀░▀░▀▀░░▀▀▀░▀▀▀░▀▀▀░▀░                               
+`
+					current_commands = {
+						e() {
+							return;
+						}
+					}
+					writeCommandsAllowed = true;
+					
 					stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
-					stream.write(chalk.bgYellow(`\r\nLevel 4!!!\r\n`));
+					stream.write(chalk.bgBlue(`\r\n${banner1.trim().replace(/\n/g, '\r\n')}`));
+					stream.write(chalk.bgBlue(`\r\n${banner2.trim().replace(/\n/g, '\r\n')}`));
+					stream.write(`\r\nType e to continue\r\n`);
+					stream.write(chalk.bgYellow(`\r\nIt sounds awfully familiar. Against your will, your stomach drops. Familiar enough to have a bodily reaction, unfamiliar enough not to recall anything.\r\n`));
+					await sleep(5000);
+					stream.write(chalk.bgYellow(`The ground is rumbling.`));
+					await sleep(2000);
+					stream.write(chalk.bgYellow(`The grass beneath your feet starts to morph into tiles, reflective tiles. For the first time, you finally get to see who you are.\r\nFilthy, worn and torn clothes transform into fresh garments. Your shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`));
+					await sleep(1000);
+					stream.write(chalk.bgYellow(`\r\nFilthy, worn and torn clothes transform into fresh garments. Your shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`));
+					await sleep(500);
+					stream.write(chalk.bgYellow(`\r\nYour shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`));
+					await typewriterEffect(`\r\nThis, this is everything you've been missing out on.\r\n`);
 				};
 
 				const death = (variation) => {
@@ -398,6 +443,6 @@ new Server({
 		eyescanAgreed = false;
 		hasWalkedIntoRoom3Already = false;
 	});
-}).listen(2012, '::', function () {
+}).listen(1, '::', function () {
 	console.log('Listening on port ' + this.address().port);
 });
