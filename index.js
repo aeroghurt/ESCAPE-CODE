@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+// problem: questions don't restart once a client has ssh'd in.
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
 const process = require('node:process');
@@ -9,7 +9,7 @@ const { Server } = require('ssh2');
 
 const chalk = require('./chalk.js');
 const allowedUser = Buffer.from('escapist');
-const allowedPassword = Buffer.from('bar');
+const allowedPassword = Buffer.from('goodbye world');
 
 let buffer = '';
 let current_commands;
@@ -372,12 +372,12 @@ new Server({
 					stream.end();
 				}
 
-				const progress_bar = async() => {
+				const progress_bar = async () => {
 					const width = process.stdout.columns;
 					let filled = `█`;
 					let remaining = `/`;
 					for (let i = 0; i <= width; i++) {
-						stream.write(`${filled.repeat(i)}${remaining.repeat(width - i)}`);
+						stream.write(chalk.green(`${filled.repeat(i)}${remaining.repeat(width - i)}`));
 						await sleep(20);
 						stream.write(chalk.green(`\r\x1b[K`));
 					}
@@ -386,7 +386,12 @@ new Server({
 		});
 	}).on('close', () => {
 		console.log('Client disconnected');
-		allowed = false;
+		buffer = '';
+		current_commands;
+		writeCommandsAllowed = false;
+		fingerprintAgreed = false;
+		eyescanAgreed = false;
+		hasWalkedIntoRoom3Already = false;
 	});
 }).listen(2220, '::', function () {
 	console.log('Listening on port ' + this.address().port);
