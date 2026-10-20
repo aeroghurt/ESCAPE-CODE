@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// problem: only one player can log in at a time.
+
 // ssh escapist@2a01:4f9:3a:276e::1342 -p 1
 const { timingSafeEqual } = require('crypto');
 const { readFileSync } = require('fs');
@@ -125,19 +125,30 @@ new Server({
 					for (let i = 0; i <= width; i++) {
 						stream.write(chalk.green(`${filled.repeat(i)}${remaining.repeat(width - i)}`));
 						await sleep(20);
-						stream.write(chalk.green(`\r\x1b[K`));
+						stream.write(`\r\x1b[K`);
 					}
 				}
 
-				const typewriterEffect = async (sentence) => {
+				const typewriterEffect1 = async (sentence) => {
 					let line = [];
 					for (const char in sentence) {
 						line.push(sentence[char]);
-						stream.write(chalk.blue(`${line.join("")}`));
-						await sleep(100);
+						stream.write(`${line.join("")}`);
+						await sleep(20);
 						stream.write(`\r\x1b[K`);
 					}
-					stream.write(chalk.bgBlue(sentence))
+					stream.write(chalk.bgYellow(sentence));
+				}
+
+				const typewriterEffect2 = async (sentence) => {
+					let line = [];
+					for (const char in sentence) {
+						line.push(sentence[char]);
+						stream.write(chalk.green(`${line.join("")}`));
+						await sleep(20);
+						stream.write(`\r\x1b[K`);
+					}
+					stream.write(chalk.bgGreen(sentence));
 				}
 
 				const intro = async () => {
@@ -162,7 +173,6 @@ new Server({
 					stream.write(chalk.bgRed(`\r\nDisclaimer: This game may require external tools, and the width of your terminal needs to be at least 94 to display things properly. Solutions are available in DONTREADME.md but reading before solving is mildly discouraged. Have fun :D\r\n`))
 					stream.write(chalk.bgBlue(`\r\nHello, escapist. You are currently in a state of unconsciousness.\r\n`))
 					stream.write(chalk.bgBlue(`\r\nDon't worry too much. Open your eyes.\r\n`))
-					await typewriterEffect(`hello world`);
 				}
 				intro();
 
@@ -262,15 +272,15 @@ new Server({
 
 					current_commands = {
 						help() {
-							stream.write(`\r\nType:\r\n- 1: to view image again\r\n- 'answer', to prompt you\r\n- 'hint'\r\n`)
+							stream.write(`\r\nType:\r- 1: to view image again\r\n- 'answer', to prompt you\r\n- 'hint'\r\n`)
 						},
 
 						1() {
-							stream.write(chalk.white(`\r\n	   ${image.trim().replace(/\n/g, '\r\n')}`));
+							stream.write(chalk.white(`\r	   ${image.trim().replace(/\n/g, '\r\n')}`));
 						},
 
 						2() {
-							stream.write(`\r\nYou run your fingers across the dots etched into the door. After a long time of feeling nothing, this sensory experience feels weird, yet oddly nice.\r\n`)
+							stream.write(`\rYou run your fingers across the dots etched into the door. After a long time of feeling nothing, this sensory experience feels weird, yet oddly nice.\r\n`)
 						},
 
 						answer() {
@@ -344,7 +354,7 @@ new Server({
 								level_4();
 							} else {
 								rl.question(chalk.blue(`Scan your irises? (yes/no)\r\n`), (answer) => {
-									stream.write(chalk.red(`\x1bAre you quite sure about this?\x1b[0m`));
+									stream.write(chalk.bgRed(`Are you quite sure about this?`));
 									if (answer === 'yes' || answer === 'y') {
 										eyescanAgreed = true;
 										level_3();
@@ -368,8 +378,12 @@ new Server({
 				};
 
 				const level_4 = async () => {
-					stream.write(chalk.bgYellow(`\r\n\x1bWell, there's no turning back now.\x1b[0m\r\n`))
+					stream.write(chalk.bgYellow(`\r\n`))
+					stream.write(chalk.bgYellow(`\x1b[3mWell, there's no turning back now.\x1b[0m`))
+					await progress_bar();
+
 					let line_number = 0;
+
 					const banner = `
 //////////////////////////////////////////////////////////
 //██╗░░░░░███████╗██╗░░░██╗███████╗██╗░░░░░░░░░██╗░░██╗░//
@@ -394,28 +408,87 @@ new Server({
 ░▀░░░▀░▀░▀░▀░▀░▀░▀▀░░▀▀▀░▀▀▀░▀▀▀░▀░                               
 `
 					current_commands = {
-						e() {
-							return;
+						async e() {
+							if (line_number < lines.length) {
+								await sleep(800);
+								await typewriterEffect1(lines[line_number]);
+								line_number += 1;
+								stream.write(`\r\nType e and press ENTER to continue\r\n`);
+							} else {
+								writeCommandsAllowed = false;
+								finale();
+								return;
+							}
 						}
 					}
+
+					let lines = [
+						`It sounds awfully familiar. Against your will, your stomach drops.`,
+						`Familiar enough to have a bodily reaction, unfamiliar enough not to recall anything.`,
+						`The ground is rumbling.`,
+						`The grass beneath your feet starts to morph into tiles, reflective tiles.`,
+						`For the first time, you finally get to see who you are.`,
+						`Filthy, worn and torn clothes transform into fresh garments.`,
+						`Your shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`,
+					]
 					writeCommandsAllowed = true;
-					
+
 					stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
 					stream.write(chalk.bgBlue(`\r\n${banner1.trim().replace(/\n/g, '\r\n')}`));
 					stream.write(chalk.bgBlue(`\r\n${banner2.trim().replace(/\n/g, '\r\n')}`));
 					stream.write(`\r\nType e to continue\r\n`);
-					stream.write(chalk.bgYellow(`\r\nIt sounds awfully familiar. Against your will, your stomach drops. Familiar enough to have a bodily reaction, unfamiliar enough not to recall anything.\r\n`));
-					await sleep(5000);
-					stream.write(chalk.bgYellow(`The ground is rumbling.`));
-					await sleep(2000);
-					stream.write(chalk.bgYellow(`The grass beneath your feet starts to morph into tiles, reflective tiles. For the first time, you finally get to see who you are.\r\nFilthy, worn and torn clothes transform into fresh garments. Your shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`));
-					await sleep(1000);
-					stream.write(chalk.bgYellow(`\r\nFilthy, worn and torn clothes transform into fresh garments. Your shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`));
-					await sleep(500);
-					stream.write(chalk.bgYellow(`\r\nYour shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`));
-					await typewriterEffect(`\r\nThis, this is everything you've been missing out on.\r\n`);
 				};
 
+
+				const finale = async () => {
+					if (finale) {
+						await typewriterEffect2(`This, this is what you've been missing out on.`);
+						rl.question(chalk.bgYellow(`Dialogue options:\r\n- 1: Can't you just leave me alone?\r\n - 2: This is really great. How do you guys get all the power for this?\r\n`)), async (option) => {
+							if (option === '1') {
+								await typewriterEffect2(`I'm afraid your situation has been taken to the point of no return.\r\n`);
+							} else if (option === `2`) {
+								await typewriterEffect2(`We source it ourselves.\r\n`);
+							}
+						}
+
+						let playerLines = [
+							`You call an artificial reality a paradise?`,
+							`I don't want it.`,
+							`You remember. The scanners.`,
+							`Looking down at the tiles again, you realise that you're simply not there. A floating consciousness.`,
+							`Who knows how your body in real life is doing.`,
+							`You remember. The famine, the corruption, the decaying cadavers piled up on the streets.`,
+							`They've found you. And you can't escape anymore.`,
+							`Not anymore.`
+						]
+
+						let machineLines = [
+							`It is leagues better than living in the current state of our decrepit, rotting world.`,
+							`That's too bad. You already signed the contract the moment you gave us your identity.`,
+							`No, not the scanners. Those were fake. In truth, you signed your soul away ages ago.`,
+							`Your father was also a major sponsor for our cause, this is the least we can do. `,
+							`Oh, your cadaver. Don't worry, it's in safe hands.`,
+							`Safer than being out there on the streets, where strays consume it as a last resort.`
+						]
+
+						let line_number = 0;
+
+						current_commands = {
+							async e() {
+								if (line_number < lines.length) {
+									await sleep(800);
+									await typewriterEffect1(lines[line_number]);
+									line_number += 1;
+									stream.write(`\r\nType e and press ENTER to continue\r\n`);
+								} else {
+									writeCommandsAllowed = false;
+									finale();
+									return;
+								}
+							}
+						}
+					}
+				}
 				const death = (variation) => {
 					stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
 					switch (variation) {
