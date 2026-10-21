@@ -18,6 +18,7 @@ let writeCommandsAllowed = false;
 let fingerprintAgreed = false;
 let eyescanAgreed = false;
 let hasWalkedIntoRoom3Already = false;
+let hasWalkedIntoRoom4Already = false;
 
 function checkValue(input, allowed) {
 	const autoReject = (input.length !== allowed.length);
@@ -268,7 +269,7 @@ new Server({
 					stream.write(chalk.white(`\r\n	   ${image.trim().replace(/\n/g, '\r\n')}`));
 					stream.write(chalk.blue(`\r\nA: 7641\r\nB: 6698\r\nC: 1720\r\nD: 2153\r\n`));
 					stream.write(chalk.white(`\r\n\x1b[3mBlind, you are, yet still looking for something.\x1b[0m`));
-					stream.write(`\r\nType:\r\n- 1: to view image again\r\n- 2: to touch the door\r\n- 'answer', to prompt you\r\n- 'hint', for a hint\r\n`)
+					stream.write(`\r\nType:\r\n- 1: to view image again\r\n- 2: to touch the door\r\n- 'answer', to prompt you\r\n- 'hint', for a hint`)
 
 					current_commands = {
 						help() {
@@ -323,7 +324,7 @@ new Server({
 						stream.write(chalk.bgYellow(`\r\nA fingerprint reader and an iris scanner. Those two seem to be the only thing in the world that matter right now. Without skipping a beat, you walk over to it clumsily, hungrily.\r\n`));
 					}
 
-					stream.write(`\r\nType:\r\n- 1: look around\r\n- 2: fingerprint scanner\r\n- 3: iris scanner\r\n`);
+					stream.write(`\r\nType:\r\n- 1: look around\r\n- 2: fingerprint scanner\r\n- 3: iris scanner`);
 
 					current_commands = {
 						help() {
@@ -378,12 +379,6 @@ new Server({
 				};
 
 				const level_4 = async () => {
-					stream.write(chalk.bgYellow(`\r\n`))
-					stream.write(chalk.bgYellow(`\x1b[3mWell, there's no turning back now.\x1b[0m`))
-					await progress_bar();
-
-					let line_number = 0;
-
 					const banner = `
 //////////////////////////////////////////////////////////
 //██╗░░░░░███████╗██╗░░░██╗███████╗██╗░░░░░░░░░██╗░░██╗░//
@@ -407,105 +402,96 @@ new Server({
 ░█▀▀░█▀█░█▀▄░█▀█░█░█░░█░░▀▀█░█▀▀░░░                               
 ░▀░░░▀░▀░▀░▀░▀░▀░▀▀░░▀▀▀░▀▀▀░▀▀▀░▀░                               
 `
-					current_commands = {
-						async e() {
-							if (line_number < lines.length) {
-								await sleep(800);
-								await typewriterEffect1(lines[line_number]);
-								line_number += 1;
-								stream.write(`\r\nType e and press ENTER to continue\r\n`);
-							} else {
-								writeCommandsAllowed = false;
-								finale();
-								return;
-							}
-						}
+					if (!hasWalkedIntoRoom4Already) {
+						stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
+						stream.write(`\r\n${banner1.trim().replace(/\n/g, '\r\n')}`);
+						stream.write(`\r\n${banner2.trim().replace(/\n/g, '\r\n')}`);
+						stream.write(chalk.bgYellow(`\r\nEverything goes silent.\r\n`));
+						await sleep(2000);
+						stream.write(chalk.bgYellow(`\r\nYou never even set foot on the threshold, yet here you are, standing in the midst of nowhere.\r\n`));
+						hasWalkedIntoRoom4Already = true;
 					}
 
-					let lines = [
-						`It sounds awfully familiar. Against your will, your stomach drops.`,
-						`Familiar enough to have a bodily reaction, unfamiliar enough not to recall anything.`,
-						`The ground is rumbling.`,
-						`The grass beneath your feet starts to morph into tiles, reflective tiles.`,
-						`For the first time, you finally get to see who you are.`,
-						`Filthy, worn and torn clothes transform into fresh garments.`,
-						`Your shaggy, self-cut hair turns into a tidy wave, years since the last time it had been.`,
-					]
+					stream.write(`\r\nType:\r\n- 1: observe clock\r\n- 2: touch clock\r\n- 3: walk around\r\n- 4: "What the hell?"\r\n`);
+
+					current_commands = {
+						help() {
+							stream.write(`\r\nType:\r\n- 1: observe clock\r\n- 2: touch clock\r\n- 3: walk around\r\n- 4: "What the hell?"`);
+						},
+
+						1() {
+							stream.write(`\r\nIt's made of cheap plastic. The kind that would break after a few falls. The second hand isn't moving, so the time is stuck at 12:00 until altered.\r\n`);
+						},
+
+						2() {
+							stream.write(`\r\nLightweight and throwable. No, you don't risk it.\r\n`);
+							stream.write(`You wonder if taking it apart would be of any help. No, you don't risk it.\r\n`);
+						},
+
+						3() {
+							rl.question(chalk.blue(`Walk in which direction? (n/e/s/w/any of the 8 directions)\r\n`), (answer) => {
+								switch (answer) {
+									case `n`:
+										stream.write(chalk.bgYellow(`Another clock, of the same size, material, and shape. Pointing at 7:30.`))
+										stream.write(`\r\nType:\r\n- 1: walk around`);
+										break;
+									case `e`:
+										stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
+										level_4();
+										break;
+									case `s`:
+										stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
+										level_4();
+										break;
+									case `w`:
+										stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
+										level_4();
+										break;
+								}
+							})
+						},
+
+						4() {
+							stream.write(`What the hell?`);
+							stream.write(chalk.bgYellow(`\r\nThat did absolutely nothing for the situation, but it made your chest feel lighter.`));
+						},
+
+						n(){},
+						e(){},
+						s(){},
+						w(){},
+					}
 					writeCommandsAllowed = true;
 
-					stream.write(chalk.white(`\r\n${banner.trim().replace(/\n/g, '\r\n')}`));
-					stream.write(chalk.bgBlue(`\r\n${banner1.trim().replace(/\n/g, '\r\n')}`));
-					stream.write(chalk.bgBlue(`\r\n${banner2.trim().replace(/\n/g, '\r\n')}`));
-					stream.write(`\r\nType e to continue\r\n`);
-				};
-
-
-				const finale = async () => {
-					if (finale) {
-						await typewriterEffect2(`This, this is what you've been missing out on.`);
-						rl.question(chalk.bgYellow(`Dialogue options:\r\n- 1: Can't you just leave me alone?\r\n - 2: This is really great. How do you guys get all the power for this?\r\n`)), async (option) => {
-							if (option === '1') {
-								await typewriterEffect2(`I'm afraid your situation has been taken to the point of no return.\r\n`);
-							} else if (option === `2`) {
-								await typewriterEffect2(`We source it ourselves.\r\n`);
-							}
-						}
-
-						let playerLines = [
-							`You call an artificial reality a paradise?`,
-							`I don't want it.`,
-							`You remember. The scanners.`,
-							`Looking down at the tiles again, you realise that you're simply not there. A floating consciousness.`,
-							`Who knows how your body in real life is doing.`,
-							`You remember. The famine, the corruption, the decaying cadavers piled up on the streets.`,
-							`They've found you. And you can't escape anymore.`,
-							`Not anymore.`
-						]
-
-						let machineLines = [
-							`It is leagues better than living in the current state of our decrepit, rotting world.`,
-							`That's too bad. You already signed the contract the moment you gave us your identity.`,
-							`No, not the scanners. Those were fake. In truth, you signed your soul away ages ago.`,
-							`Your father was also a major sponsor for our cause, this is the least we can do. `,
-							`Oh, your cadaver. Don't worry, it's in safe hands.`,
-							`Safer than being out there on the streets, where strays consume it as a last resort.`
-						]
-
-						let line_number = 0;
-
+					const level_4_latter = () => {
 						current_commands = {
-							async e() {
-								if (line_number < lines.length) {
-									await sleep(800);
-									await typewriterEffect1(lines[line_number]);
-									line_number += 1;
-									stream.write(`\r\nType e and press ENTER to continue\r\n`);
-								} else {
-									writeCommandsAllowed = false;
-									finale();
-									return;
-								}
-							}
-						}
-					}
-				}
-				const death = (variation) => {
-					stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
-					switch (variation) {
-						case 1:
-							stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.`));
-							stream.write(`\r\n`);
-							break;
-						case 2:
-							stream.write(chalk.bgYellow(`\r\nSomething has opened. You hear the gushing of water before you see it.\r\nWithin a mere few seconds, the water level had already reached your ankles.\r\nYou try the fingerprint reader, the iris scanner, desperate. Nothing works.\r\nYour legs, your chest, then your neck. The wait is agonisingly slow, yet excruciatingly fast.\r\nYou turn your head skywards, looking at the artificial heaven above.`));
-							stream.write(`\r\n`);
-							break;
-					}
+							help() {
+								stream.write(`\r\nType:\r\n- 1: walk around`);
+							},
 
-					stream.exit(0);
-					stream.end();
+							1() {
+							},
+						}
+					};
 				}
-			});
+
+					const death = (variation) => {
+						stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
+						switch (variation) {
+							case 1:
+								stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.`));
+								stream.write(`\r\n`);
+								break;
+							case 2:
+								stream.write(chalk.bgYellow(`\r\nSomething has opened. You hear the gushing of water before you see it.\r\nWithin a mere few seconds, the water level had already reached your ankles.\r\nYou try the fingerprint reader, the iris scanner, desperate. Nothing works.\r\nYour legs, your chest, then your neck. The wait is agonisingly slow, yet excruciatingly fast.\r\nYou turn your head skywards, looking at the artificial heaven above.`));
+								stream.write(`\r\n`);
+								break;
+						}
+
+						stream.exit(0);
+						stream.end();
+					}
+				});
 		});
 	}).on('close', () => {
 		console.log('Client disconnected');
