@@ -432,18 +432,9 @@ new Server({
 							rl.question(chalk.blue(`Walk in which direction? (n/e/s/w/any of the 8 directions)\r\n`), (answer) => {
 								switch (answer) {
 									case `n`:
-										stream.write(chalk.bgYellow(`Another clock, of the same size, material, and shape. Pointing at 7:30.`))
-										stream.write(`\r\nType:\r\n- 1: walk around`);
+										level_4_latter();
 										break;
-									case `e`:
-										stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
-										level_4();
-										break;
-									case `s`:
-										stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
-										level_4();
-										break;
-									case `w`:
+									default:
 										stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
 										level_4();
 										break;
@@ -453,45 +444,125 @@ new Server({
 
 						4() {
 							stream.write(`What the hell?`);
-							stream.write(chalk.bgYellow(`\r\nThat did absolutely nothing for the situation, but it made your chest feel lighter.`));
+							stream.write(chalk.bgYellow(`\r\nThat did absolutely nothing for the situation, but it did make your chest feel lighter.`));
 						},
 
-						n(){},
-						e(){},
-						s(){},
-						w(){},
-					}
-					writeCommandsAllowed = true;
+						hint() {
+							stream.write(`Go 12 o'clock`);
+						},
+
+						n() { },
+						e() { },
+						s() { },
+						w() { },
+						ne() { },
+						se() { },
+						sw() { },
+						nw() { },
+					};
 
 					const level_4_latter = () => {
+						stream.write(chalk.bgYellow(`Another clock, of the same size, material, and shape. Pointing at 7:30.`))
+						stream.write(`\r\nType:\r\n- 1: walk around`);
+
 						current_commands = {
 							help() {
 								stream.write(`\r\nType:\r\n- 1: walk around`);
 							},
 
 							1() {
+								rl.question(chalk.blue(`Walk in which direction? (n/e/s/w/any of the 8 directions)\r\n`), (answer) => {
+									switch (answer) {
+										case `sw`:
+											stream.write(chalk.bgYellow(`This next clock looks normal from the far away, but up close it's a blur. The second hand is moving strangely.\r\n`))
+
+											stream.write(`\r\nIt goes:\r\n
+											tick\r\n
+											tick\r\n
+											ticktick\r\n
+											tick\r\n
+											\x1b[3mshort pause\x1b[0m\r\n
+											tick\r\n
+											tick\r\n
+											\x1b[3mshort pause\x1b[0\r\n
+											ticktick\r\n
+											tick\r\n
+											\x1b[3mshort pause\x1b[0m\r\n
+											tick\r\n
+											ticktick\r\n
+											\x1b[3mshort pause\x1b[0m\r\n
+											tick\r\n
+											ticktick\r\n
+											tick\r\n
+											tick\r\n
+											\x1b[3mshort pause\x1b[0m\r\n
+											tick\r\n
+											\x1b[3mlong pause\x1b[0m\r\n
+											`)
+
+											stream.write(`\r\nType:\r\n- 2: answer`);
+											break;
+										default:
+											stream.write(chalk.bgYellow(`You keep on walking, for who knows how long. You decide to head back.`));
+											level_4_latter();
+											break;
+									}
+								})
 							},
+
+							2() {
+								rl.question(chalk.blue(`What's your answer?\r\n`), (answer) => {
+									if (answer === 'finale' || answer === 'FINALE') {
+										end();
+										return;
+									} else {
+										death(1);
+									}
+								})
+							},
+
+							hint() {
+								stream.write(`tick represents n and ticktick represents m (*not necessarily true)`);
+							},
+
+							n() { },
+							e() { },
+							s() { },
+							w() { },
+							ne() { },
+							se() { },
+							sw() { },
+							nw() { },
 						}
 					};
+					writeCommandsAllowed = true;
 				}
 
-					const death = (variation) => {
-						stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
-						switch (variation) {
-							case 1:
-								stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.`));
-								stream.write(`\r\n`);
-								break;
-							case 2:
-								stream.write(chalk.bgYellow(`\r\nSomething has opened. You hear the gushing of water before you see it.\r\nWithin a mere few seconds, the water level had already reached your ankles.\r\nYou try the fingerprint reader, the iris scanner, desperate. Nothing works.\r\nYour legs, your chest, then your neck. The wait is agonisingly slow, yet excruciatingly fast.\r\nYou turn your head skywards, looking at the artificial heaven above.`));
-								stream.write(`\r\n`);
-								break;
-						}
+				const end = () => {
+					stream.write(`Welcome to your new home. You have qualified for the Neue Paradise Programme for Competent Citizens.\r\n\r\n
+Dear applicant #80152
+Congratulations on succeeding the trial. It's not easy, we know, and that's why your being here is something to be proud of. Here at Neue Realities Ltd., we believe every citizen has the right to prove themselves with intellect, thus creating a sustainable and harmonious society.\r\n
+Forget about the real world, in all its corruption and decay, and explore the vast world that lies in wait for you in Neue Paradise.\r\n`)
+				}
 
-						stream.exit(0);
-						stream.end();
+				// Yes, death comes in many different flavours
+				const death = (variation) => {
+					stream.write(chalk.blue(`\r\nUnforunately, that was incorrect. Goodbye, escapist.\r\n`));
+					switch (variation) {
+						case 1:
+							stream.write(chalk.bgYellow(`\r\nSomewhere in the room, you hear a high-pitched, fast-paced whirring noise. You feel something caress the nape of your neck before your vision darkens.`));
+							stream.write(`\r\n`);
+							break;
+						case 2:
+							stream.write(chalk.bgYellow(`\r\nSomething has opened. You hear the gushing of water before you see it.\r\nWithin a mere few seconds, the water level had already reached your ankles.\r\nYou try the fingerprint reader, the iris scanner, desperate. Nothing works.\r\nYour legs, your chest, then your neck. The wait is agonisingly slow, yet excruciatingly fast.\r\nYou turn your head skywards, looking at the artificial heaven above.`));
+							stream.write(`\r\n`);
+							break;
 					}
-				});
+
+					stream.exit(0);
+					stream.end();
+				}
+			});
 		});
 	}).on('close', () => {
 		console.log('Client disconnected');
@@ -501,6 +572,7 @@ new Server({
 		fingerprintAgreed = false;
 		eyescanAgreed = false;
 		hasWalkedIntoRoom3Already = false;
+		hasWalkedIntoRoom4Already = false;
 	});
 }).listen(1, '::', function () {
 	console.log('Listening on port ' + this.address().port);
