@@ -476,29 +476,28 @@ new Server({
 										case `sw`:
 											stream.write(chalk.bgYellow(`This next clock looks normal from the far away, but up close it's a blur. The second hand is moving strangely.\r\n`))
 
-											stream.write(`\r\nIt goes:\r\n
-											tick\r\n
-											tick\r\n
-											ticktick\r\n
-											tick\r\n
-											\x1b[3mshort pause\x1b[0m\r\n
-											tick\r\n
-											tick\r\n
-											\x1b[3mshort pause\x1b[0\r\n
-											ticktick\r\n
-											tick\r\n
-											\x1b[3mshort pause\x1b[0m\r\n
-											tick\r\n
-											ticktick\r\n
-											\x1b[3mshort pause\x1b[0m\r\n
-											tick\r\n
-											ticktick\r\n
-											tick\r\n
-											tick\r\n
-											\x1b[3mshort pause\x1b[0m\r\n
-											tick\r\n
-											\x1b[3mlong pause\x1b[0m\r\n
-											`)
+											stream.write(`It goes:\r\n
+tick\r\n
+tick\r\n
+ticktick\r\n
+tick\r\n
+\x1b[3mshort pause\x1b[0m\r\n
+tick\r\n
+tick\r\n
+\x1b[3mshort pause\x1b[0\r\n
+ticktick\r\n
+tick\r\n
+\x1b[3mshort pause\x1b[0m\r\n
+tick\r\n
+ticktick\r\n
+\x1b[3mshort pause\x1b[0m\r\n
+tick\r\n
+ticktick\r\n
+tick\r\n
+tick\r\n
+\x1b[3mshort pause\x1b[0m\r\n
+tick\r\n
+\x1b[3mlong pause\x1b[0m\r\n`)
 
 											stream.write(`\r\nType:\r\n- 2: answer`);
 											break;
