@@ -1,7 +1,7 @@
 # ESCAPE CODE
 
 ## HOW TO LOG IN
-Type `ssh escapist@2a01:4f9:3a:276e::1342 -p 2220` into the terminal.<br>
+Type `ssh escapist@2a01:4f9:3a:276e::1342 -p 1` into the terminal.<br>
 Once prompted, type in the password `goodbye world`.<br>
 You'll know you've successfully logged in once you see:<br>
 ![game start image](ss1.png)
