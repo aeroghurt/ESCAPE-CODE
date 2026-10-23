@@ -222,7 +222,7 @@ new Server({
 						},
 
 						3() {
-							stream.write(`\rYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'You thought you were the Chosen One?'\r\n`);
+							stream.write(`\rYou had actually been clenching a now-crumpled strip of paper in your hand. It reads: 'Disqualification is instant. Choose wisely.'\r\n`);
 						},
 
 						answer() {
@@ -337,7 +337,6 @@ new Server({
 								level_4();
 							} else {
 								rl.question(chalk.blue(`Put thumb onto fingerprint reader? (yes/no)\r\n`), (answer) => {
-									stream.write(chalk.red(`\x1bAre you quite sure about this?\x1b[0m`));
 									if (answer === 'yes' || answer === 'y') {
 										fingerprintAgreed = true;
 										level_3();
@@ -355,7 +354,6 @@ new Server({
 								level_4();
 							} else {
 								rl.question(chalk.blue(`Scan your irises? (yes/no)\r\n`), (answer) => {
-									stream.write(chalk.bgRed(`Are you quite sure about this?`));
 									if (answer === 'yes' || answer === 'y') {
 										eyescanAgreed = true;
 										level_3();
@@ -462,7 +460,7 @@ new Server({
 					};
 
 					const level_4_latter = () => {
-						stream.write(chalk.bgYellow(`Another clock, of the same size, material, and shape. Pointing at 7:30.`))
+						stream.write(chalk.bgYellow(`\r\nAnother clock, of the same size, material, and shape. Pointing at 7:30.`))
 						stream.write(`\r\nType:\r\n- 1: walk around`);
 
 						current_commands = {
@@ -532,14 +530,17 @@ tick\r\n
 							se() { },
 							sw() { },
 							nw() { },
+
+							finale() { },
+							FINALE() { },
 						}
 					};
 					writeCommandsAllowed = true;
 				}
 
 				const end = () => {
-					stream.write(`Welcome to your new home. You have qualified for the Neue Paradise Programme for Competent Citizens.\r\n\r\n
-Dear applicant #80152
+					stream.write(`\r\nWelcome to your new home. You have qualified for the Neue Paradise Programme for Competent Citizens.\r\n
+Dear applicant #80152\r\n
 Congratulations on succeeding the trial. It's not easy, we know, and that's why your being here is something to be proud of. Here at Neue Realities Ltd., we believe every citizen has the right to prove themselves with intellect, thus creating a sustainable and harmonious society.\r\n
 Forget about the real world, in all its corruption and decay, and explore the vast world that lies in wait for you in Neue Paradise.\r\n`)
 				}
