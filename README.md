@@ -14,4 +14,4 @@ I'm very open to criticism TT<br>
 The story did a 180° I believe. At first it was supposed to be darker, but I realised that reading a huge wall of text was going to be really boring, so I made the ending a bit more interactive and less dark, that's why it's (kind of) rushed. Thanks to anyone willing to play my game :D
 
 ## NOTE
-If the terminal gives you the 'no route to host' error, that might be because your ISP doesn't support ipv6 connection, try using a tunnelbroker or cloudflare warp (<-- preferred).
+If the terminal gives you the 'no route to host' error, that might be because your ISP doesn't support ipv6 connection, try using a tunnelbroker, switching to cellular data or cloudflare warp (<-- preferred).
